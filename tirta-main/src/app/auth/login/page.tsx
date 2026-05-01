@@ -146,7 +146,7 @@ export default function LoginPage() {
                 setIsLogin(!isLogin);
                 setError("");
               }}
-              className="text-brand-600 font-semibold hover:text-brand-700 cursor-pointer"
+              className="p-0 text-brand-600 font-semibold hover:text-brand-700 cursor-pointer"
             >
               {isLogin ? "Sign Up" : "Sign In"}
             </Button>
