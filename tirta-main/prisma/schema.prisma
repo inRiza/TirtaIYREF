@@ -1,18 +1,172 @@
 generator client {
-  provider = "prisma-client-js"
+    provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+    provider = "postgresql"
 }
 
 model User {
-  id            String     @id @default(cuid())
-  email         String     @unique
-  name          String?
-  photoURL      String?
-  firebaseUID   String     @unique
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
+    id          String       @id @default(cuid())
+    email       String       @unique
+    name        String?
+    photoURL    String?
+    firebaseUID String       @unique
+    reports     UserReport[]
+    createdAt   DateTime     @default(now())
+    updatedAt   DateTime     @updatedAt
+}
+
+model FloodZone {
+    id              String            @id @default(cuid())
+    name            String
+    boundary        Json  
+    centerLat       Float
+    centerLng       Float
+    riskCategory    ZoneRiskLevel     @default(UNKNOWN)
+    predictionScore Float?            // FRI
+    lastPredictedAt DateTime?
+    reports         UserReport[]
+    createdAt       DateTime          @default(now())
+    updatedAt       DateTime          @updatedAt
+}
+
+enum ZoneRiskLevel {
+    SANGAT_RAWAN
+    RAWAN
+    TIDAK_RAWAN
+    UNKNOWN
+}
+
+model FloodAreaHistory {
+    id              String   @id @default(cuid())
+    areaName        String?
+    latitude        Float
+    longitude       Float
+    areaM2          Float
+    totalIncidents  Int
+    source          String?
+    notes           String?
+    createdAt       DateTime @default(now())
+    updatedAt       DateTime @updatedAt
+    @@index([latitude, longitude])
+}
+
+
+model UserReport {
+    id                String             @id @default(cuid())
+    userId            String
+    user              User               @relation(fields: [userId], references: [id])
+    zoneId            String?
+    zone              FloodZone?         @relation(fields: [zoneId], references: [id])
+
+    title             String?
+    description       String?           // dari catatan tambahan
+    latitude          Float
+    longitude         Float
+    address           String?
+    reportedAt        DateTime           @default(now())
+
+    drainageQuality   DrainageQuality?
+    garbageCategory   GarbageCategory?
+    roadType          RoadType?
+    vegetationDensity VegetationDensity?
+
+    photos            ReportPhoto[]
+    analysis          ReportAnalysis?
+    floodHistory      ReportFloodHistory[]
+
+    createdAt         DateTime           @default(now())
+    updatedAt         DateTime           @updatedAt
+
+    @@index([latitude, longitude])
+    @@index([userId])
+    @@index([zoneId])
+    @@index([reportedAt])
+}
+
+enum DrainageQuality {
+    BAIK
+    SEDANG
+    BURUK
+    TIDAK_ADA
+}
+
+enum GarbageCategory {
+    RINGAN
+    SEDANG
+    BANYAK
+}
+
+enum RoadType {
+    ASPAL
+    BETON
+    PAVING
+    TANAH
+    LAINNYA
+}
+
+enum VegetationDensity {
+    RINGAN
+    SEDANG
+    BANYAK
+    TIDAK_ADA
+}
+
+
+model ReportFloodHistory {
+    id           String     @id @default(cuid())
+    reportId     String
+    report       UserReport @relation(fields: [reportId], references: [id])
+    occurredAt   DateTime
+    notes        String?
+    createdAt    DateTime   @default(now())
+
+    @@index([reportId])
+}
+
+// ml photo
+model ReportPhoto {
+    id              String        @id @default(cuid())
+    reportId        String
+    report          UserReport    @relation(fields: [reportId], references: [id])
+    photoURL        String
+    category        PhotoCategory @default(GENERAL)
+    description     String?
+    detectedObjects Json?
+    measuredLengthM Float?
+    hasVegetation   Boolean?
+    createdAt       DateTime      @default(now())
+
+    @@index([reportId])
+}
+
+// kalo perlu pake aja
+enum PhotoCategory {
+    DRAINAGE
+    VEGETATION
+    ROAD
+    GENERAL
+}
+
+model ReportAnalysis {
+    id                String        @id @default(cuid())
+    reportId          String        @unique
+    report            UserReport    @relation(fields: [reportId], references: [id])
+
+    // hasil deteksi dari foto
+    surfaceType       String?
+    drainageStatus    String?
+    cleanliness       String?
+    vegetation        String?
+    drainageLengthM   Float?
+    vegetationLengthM Float?
+
+    zoneIncidentCount Int?     
+    floodRiskScore    Float
+    riskLevel         ZoneRiskLevel
+    recommendation    String?
+
+    createdAt         DateTime      @default(now())
+    updatedAt         DateTime      @updatedAt
 }
