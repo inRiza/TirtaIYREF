@@ -200,7 +200,7 @@ export default function HomePage() {
               {dataLoading ? (
                 <div className="flex gap-3 px-5 overflow-x-auto pb-2 scrollbar-hide">
                   {[...Array(4).keys()].map((i) => (
-                    <ReportCardOverlaySkeleton key={`${i}`} />
+                    <ReportCardOverlaySkeleton key={`overlay-skel-${i}`} />
                   ))}
                 </div>
               ) : nearby.length === 0 ? (
@@ -247,7 +247,7 @@ export default function HomePage() {
             {dataLoading ? (
               <div className="px-5 space-y-3">
                 {[...Array(4).keys()].map((i) => (
-                  <ReportCardRowSkeleton key={`${i}`} />
+                  <ReportCardRowSkeleton key={`row-skel-${i}`} />
                 ))}
               </div>
             ) : displayListed.length === 0 ? (

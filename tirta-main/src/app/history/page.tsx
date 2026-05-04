@@ -116,7 +116,7 @@ export default function HistoryPage() {
           {dataLoading ? (
             <div className="space-y-3 pt-4">
               {[...Array(4).keys()].map((i) => (
-                <ReportCardRowSkeleton key={`${i}`} />
+                <ReportCardRowSkeleton key={`row-skel-${i}`} />
               ))}
             </div>
           ) : filteredReports.length === 0 ? (
