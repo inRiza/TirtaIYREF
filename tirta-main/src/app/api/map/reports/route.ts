@@ -72,6 +72,9 @@ interface RawReport {
   longitude: number;
   address: string | null;
   reportedAt: Date;
+  photos: {
+    photoURL: string;
+  }[];
   analysis: {
     floodRiskScore: number;
     riskLevel: "SANGAT_RAWAN" | "RAWAN" | "TIDAK_RAWAN" | "UNKNOWN";
@@ -134,6 +137,15 @@ export async function GET(req: NextRequest) {
         longitude: true,
         address: true,
         reportedAt: true,
+        photos: {
+          select: {
+            photoURL: true,
+          },
+          orderBy: {
+            createdAt: "asc",
+          },
+          take: 1,
+        },
         analysis: {
           select: {
             floodRiskScore: true,
@@ -168,7 +180,7 @@ export async function GET(req: NextRequest) {
       haversineMeters(lat, lng, report.latitude, report.longitude) <= radiusM,
   );
 
-  const clustered = clusterReports(inRadius as RawReport[]);
+  const clustered = clusterReports(inRadius);
 
   return NextResponse.json({
     reports: clustered,
