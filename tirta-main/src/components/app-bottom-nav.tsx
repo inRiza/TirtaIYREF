@@ -6,50 +6,84 @@ import { usePathname, useRouter } from "next/navigation";
 export function AppBottomNav() {
   const router = useRouter();
   const pathname = usePathname();
+  const items = [
+    {
+      key: "home",
+      label: "Home",
+      path: "/home",
+      icon: Home,
+    },
+    {
+      key: "map",
+      label: "Map",
+      path: "/map",
+      icon: MapPin,
+    },
+    {
+      key: "history",
+      label: "History",
+      path: "/history",
+      icon: Clock,
+    },
+  ];
+  const activeIndex = Math.max(
+    0,
+    items.findIndex((item) => item.path === pathname),
+  );
+  const baseButton =
+    "flex flex-1 flex-col items-center gap-1.5 rounded-xl py-2 transition-colors";
+  const inactiveButton =
+    "text-slate-500 hover:bg-slate-50 hover:text-brand-600";
+  const activeButton = "text-brand-600";
+  const raisedButton = "relative -mt-5";
+  const baseMapBubble =
+    "flex h-12 w-12 items-center justify-center rounded-full shadow-md ring-4 ring-white";
 
   return (
-    <nav className="md:absolute md:bottom-0 md:left-1/2 md:w-full md:max-w-md md:-translate-x-1/2 md:px-5 md:pb-5 fixed bottom-0 left-1/2 w-full max-w-md -translate-x-1/2 px-5 pb-5">
-      <div className="relative flex items-end justify-between rounded-3xl bg-white px-7 py-4 shadow-lg">
-        <button
-          type="button"
-          className={
-            pathname === "/home"
-              ? "cursor-pointer flex flex-col items-center gap-2 text-brand-600 hover:bg-brand-600/80"
-              : "cursor-pointer flex flex-col items-center gap-2 text-slate-500 hover:bg-slate-50"
-          }
-          onClick={() => router.push("/home")}
-        >
-          <Home size={20} />
-          <span className="text-[11px] font-semibold">Home</span>
-        </button>
+    <nav className="absolute inset-x-0 bottom-0 z-40 w-full">
+      <div className="relative mx-auto flex w-full max-w-md items-center justify-around border-t border-slate-200 bg-white/95 px-2 py-2.5 shadow-[0_-6px_20px_rgba(15,23,42,0.08)] backdrop-blur md:rounded-t-2xl">
+        <div className="pointer-events-none absolute inset-x-2 bottom-1 h-1">
+          <div
+            className="h-full w-1/3 rounded-full bg-brand transition-transform duration-300"
+            style={{ transform: `translateX(${activeIndex * 100}%)` }}
+          />
+        </div>
 
-        <button
-          type="button"
-          className={
-            pathname === "/map"
-              ? "cursor-pointer relative -mt-10 flex flex-col items-center gap-2 text-brand-600 hover:bg-brand-600/80"
-              : "cursor-pointer relative -mt-10 flex flex-col items-center gap-2 text-slate-500 hover:bg-slate-50"
-          }
-          onClick={() => router.push("/map")}
-        >
-          <span className="flex h-14 w-14 items-center justify-center rounded-full bg-brand text-white shadow-lg ring-8 ring-white">
-            <MapPin size={22} />
-          </span>
-          <span className="text-[11px] font-semibold">Map</span>
-        </button>
+        {items.map((item) => {
+          const isActive = item.path === pathname;
+          const Icon = item.icon;
+          const buttonClass = [
+            baseButton,
+            isActive ? activeButton : inactiveButton,
+            item.key === "map" ? raisedButton : "",
+          ]
+            .filter(Boolean)
+            .join(" ");
 
-        <button
-          type="button"
-          className={
-            pathname === "/history"
-              ? "cursor-pointer flex flex-col items-center gap-2 text-brand-600 hover:bg-brand-600/80"
-              : "cursor-pointer flex flex-col items-center gap-2 text-slate-500 hover:bg-slate-50"
-          }
-          onClick={() => router.push("/history")}
-        >
-          <Clock size={20} />
-          <span className="text-[11px] font-semibold">History</span>
-        </button>
+          return (
+            <button
+              key={item.key}
+              type="button"
+              className={buttonClass}
+              onClick={() => router.push(item.path)}
+            >
+              {item.key === "map" ? (
+                <span
+                  className={
+                    isActive
+                      ? `${baseMapBubble} bg-brand-600 text-white`
+                      : `${baseMapBubble} bg-brand text-white`
+                  }
+                >
+                  <Icon size={22} />
+                </span>
+              ) : (
+                <Icon size={20} />
+              )}
+              <span className="text-[11px] font-semibold">{item.label}</span>
+            </button>
+          );
+        })}
       </div>
     </nav>
   );
