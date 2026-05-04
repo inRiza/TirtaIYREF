@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+set -e
+
+cd tirta-main
+
+bunx biome check .
+bun run build
