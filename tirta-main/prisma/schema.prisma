@@ -24,7 +24,7 @@ model FloodZone {
     centerLat       Float
     centerLng       Float
     riskCategory    ZoneRiskLevel     @default(UNKNOWN)
-    predictionScore Float?            // FRI
+    // predictionScore Float?         
     lastPredictedAt DateTime?
     reports         UserReport[]
     createdAt       DateTime          @default(now())
@@ -149,6 +149,12 @@ enum PhotoCategory {
     GENERAL
 }
 
+enum RiskCategory {
+    TINGGI
+    SEDANG
+    RENDAH
+}
+
 model ReportAnalysis {
     id                String        @id @default(cuid())
     reportId          String        @unique
@@ -163,8 +169,9 @@ model ReportAnalysis {
     vegetationLengthM Float?
 
     zoneIncidentCount Int?     
-    floodRiskScore    Float
+    floodRiskScore    Float        // FRI
     riskLevel         ZoneRiskLevel
+    categoryLevel     RiskCategory    
     recommendation    String?
 
     createdAt         DateTime      @default(now())
