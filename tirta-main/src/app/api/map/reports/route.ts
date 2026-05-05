@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
+import type { RiskCategory, ZoneRiskLevel } from "@/generated/prisma";
 import { prisma } from "@/lib/prisma";
 
 // in meters
@@ -77,8 +78,8 @@ interface RawReport {
   }[];
   analysis: {
     floodRiskScore: number;
-    riskLevel: "SANGAT_RAWAN" | "RAWAN" | "TIDAK_RAWAN" | "UNKNOWN";
-    categoryLevel: "TINGGI" | "SEDANG" | "RENDAH" | null;
+    riskLevel: ZoneRiskLevel;
+    categoryLevel: RiskCategory;
   } | null;
 }
 
@@ -89,8 +90,8 @@ interface ClusteredReport {
   address: string | null;
   reportedAt: string;
   floodRiskScore: number;
-  riskLevel: "SANGAT_RAWAN" | "RAWAN" | "TIDAK_RAWAN" | "UNKNOWN";
-  categoryLevel: "TINGGI" | "SEDANG" | "RENDAH" | null;
+  riskLevel: ZoneRiskLevel;
+  categoryLevel: RiskCategory | null;
   clusterCount: number;
   clusterIds: string[];
 }

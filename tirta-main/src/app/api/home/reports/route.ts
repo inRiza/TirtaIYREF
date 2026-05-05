@@ -30,8 +30,8 @@ export async function GET(req: NextRequest) {
   const lat = parseFloat(searchParams.get("lat") ?? "0");
   const lng = parseFloat(searchParams.get("lng") ?? "0");
   const radiusM = parseFloat(searchParams.get("radius") ?? "10000");
-  const nearbyLimit = parseInt(searchParams.get("nearbyLimit") ?? "6");
-  const latestLimit = parseInt(searchParams.get("latestLimit") ?? "20");
+  const nearbyLimit = parseInt(searchParams.get("nearbyLimit") ?? "6", 10);
+  const latestLimit = parseInt(searchParams.get("latestLimit") ?? "20", 10);
   const sort = (searchParams.get("sort") ?? "latest") as
     | "nearest"
     | "latest"

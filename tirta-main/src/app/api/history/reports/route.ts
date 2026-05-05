@@ -4,13 +4,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-
   const firebaseUID = searchParams.get("firebaseUID");
-  const sort = (searchParams.get("sort") ?? "latest") as
-    | "latest"
-    | "oldest"
-    | "nearest";
-  const riskRaw = searchParams.get("riskCategory");
 
   if (!firebaseUID) {
     return NextResponse.json(
@@ -22,6 +16,12 @@ export async function GET(req: NextRequest) {
       },
     );
   }
+
+  const sort = (searchParams.get("sort") ?? "latest") as
+    | "latest"
+    | "oldest"
+    | "nearest";
+  const riskRaw = searchParams.get("riskCategory");
 
   // parse filter risiko
   const riskFilter = riskRaw
