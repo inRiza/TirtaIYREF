@@ -35,6 +35,7 @@ model FloodZone {
 enum ZoneRiskLevel {
     SANGAT_RAWAN
     RAWAN
+    CUKUP_RAWAN
     TIDAK_RAWAN
     UNKNOWN
 }
@@ -97,6 +98,7 @@ enum GarbageCategory {
     RINGAN
     SEDANG
     BANYAK
+    TIDAK_ADA
 }
 
 enum RoadType {
