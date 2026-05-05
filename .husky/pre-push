@@ -5,3 +5,6 @@ cd tirta-main
 
 bunx biome check .
 bun run build
+
+cd ../tirta-models
+uv run ruff check src/api

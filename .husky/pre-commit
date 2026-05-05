@@ -4,3 +4,6 @@ set -e
 cd tirta-main
 
 bunx biome check --write .
+
+cd ../tirta-models
+uv run ruff check src/api
