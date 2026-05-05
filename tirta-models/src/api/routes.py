@@ -33,12 +33,12 @@ def aggregate(results: List[Dict]) -> Dict:
     }
 
 
-@router.get("/health")
+@router.get("/models/visual/health")
 def health(request: Request):
     return {"status": "ok", "models_loaded": request.app.state.analyzer is not None}
 
 
-@router.post("/analyze")
+@router.post("/models/visual/analyze")
 async def analyze(request: Request, files: List[UploadFile] = File(...)):
     for f in files:
         if not f.content_type or not f.content_type.startswith("image/"):
@@ -61,7 +61,7 @@ def _get_forecast_path() -> Path:
     return base / "flood_history" / "output" / "exports" / "forecast_output.json"
 
 
-@router.get("/forecasts")
+@router.get("/models/forecast")
 def get_forecasts(limit: Optional[int] = Query(None, gt=0)):
     p = _get_forecast_path()
     if not p.exists():
@@ -80,7 +80,7 @@ def get_forecasts(limit: Optional[int] = Query(None, gt=0)):
     return JSONResponse(data)
 
 
-@router.get("/forecasts/download")
+@router.get("/models/forecast/download")
 def download_forecast():
     p = _get_forecast_path()
     if not p.exists():
