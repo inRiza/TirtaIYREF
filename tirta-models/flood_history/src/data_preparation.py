@@ -8,7 +8,7 @@ Predict flood risk per grid cell
 import pandas as pd
 import numpy as np
 from shapely import wkb
-from typing import Tuple, Dict, List
+from typing import Tuple
 import logging
 import warnings
 warnings.filterwarnings('ignore')
@@ -38,7 +38,7 @@ class GridGenerator:
     
     def create_grid(self) -> pd.DataFrame:
         """Create grid of 1km x 1km cells across Indonesia"""
-        logger.info(f"Generating 1km x 1km grid across Indonesia...")
+        logger.info("Generating 1km x 1km grid across Indonesia...")
         
         lat_min = self.bounds['lat_min']
         lat_max = self.bounds['lat_max']
@@ -332,7 +332,7 @@ class GridBasedDataPreparation:
             'date_range': f"{self.df_indo['start_date'].min()} to {self.df_indo['start_date'].max()}",
         }
         
-        logger.info(f"Data validation complete")
+        logger.info("Data validation complete")
         return stats
     
     def get_prepared_data(self) -> pd.DataFrame:

@@ -6,10 +6,9 @@ Complete workflow from raw data to 1km x 1km grid risk predictions
 
 import logging
 import pandas as pd
-import numpy as np
 from config import (
-    DATA_PATH, INDONESIA_BOUNDS, LOOKBACK_WINDOW, DATA_CONFIG,
-    MODELS_CONFIG, FEATURE_CONFIG, RANDOM_SEED, RISK_CONFIG
+    DATA_PATH, INDONESIA_BOUNDS, DATA_CONFIG,
+    MODELS_CONFIG, FEATURE_CONFIG, RISK_CONFIG
 )
 from data_preparation import GridBasedDataPreparation
 from feature_engineering import FeatureEngineer

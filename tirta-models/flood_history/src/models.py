@@ -10,7 +10,7 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 import logging
-from typing import Dict, Tuple, List, Optional
+from typing import Dict
 
 logger = logging.getLogger(__name__)
 

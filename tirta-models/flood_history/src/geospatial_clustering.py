@@ -16,7 +16,7 @@ import pandas as pd
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
 import logging
-from typing import Tuple, Dict
+from typing import Dict
 
 logger = logging.getLogger(__name__)
 
