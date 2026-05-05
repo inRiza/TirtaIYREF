@@ -1,11 +1,15 @@
-from fastapi import APIRouter, File, HTTPException, Request, UploadFile
+from typing import Optional, List, Dict
+from fastapi import APIRouter, File, HTTPException, Request, UploadFile, Query
+from fastapi.responses import FileResponse, JSONResponse
+from pathlib import Path
+import json
 
 from src.core.visual_analyzer import WEIGHTS
 
 router = APIRouter()
 
 
-def aggregate(results: list[dict]) -> dict:
+def aggregate(results: List[Dict]) -> Dict:
     veg    = sum(r["vegetation_ratio"]  for r in results) / len(results)
     imperv = sum(r["impervious_ratio"]  for r in results) / len(results)
     drain  = sum(r["drainage_ratio"]    for r in results) / len(results)
@@ -35,7 +39,7 @@ def health(request: Request):
 
 
 @router.post("/analyze")
-async def analyze(request: Request, files: list[UploadFile] = File(...)):
+async def analyze(request: Request, files: List[UploadFile] = File(...)):
     for f in files:
         if not f.content_type or not f.content_type.startswith("image/"):
             raise HTTPException(status_code=400, detail=f"{f.filename} is not an image")
@@ -50,3 +54,36 @@ async def analyze(request: Request, files: list[UploadFile] = File(...)):
         return {"aggregate": results[0], "per_photo": results}
 
     return {"aggregate": aggregate(results), "per_photo": results}
+
+
+def _get_forecast_path() -> Path:
+    base = Path(__file__).resolve().parents[2]
+    return base / "flood_history" / "output" / "exports" / "forecast_output.json"
+
+
+@router.get("/forecasts")
+def get_forecasts(limit: Optional[int] = Query(None, gt=0)):
+    p = _get_forecast_path()
+    if not p.exists():
+        raise HTTPException(status_code=404, detail="forecast_output.json not found")
+    try:
+        data = json.loads(p.read_text(encoding="utf-8"))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+    if limit:
+        data_copy = dict(data)
+        data_copy["data"] = data_copy.get("data", [])[:limit]
+        data_copy["record_count"] = len(data_copy["data"])
+        return JSONResponse(data_copy)
+
+    return JSONResponse(data)
+
+
+@router.get("/forecasts/download")
+def download_forecast():
+    p = _get_forecast_path()
+    if not p.exists():
+        raise HTTPException(status_code=404, detail="forecast_output.json not found")
+    return FileResponse(str(p), filename=p.name, media_type="application/json")
+ 
