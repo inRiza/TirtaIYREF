@@ -13,6 +13,12 @@ from src.core.visual_analyzer import WEIGHTS
 
 router = APIRouter()
 
+def get_analyzer(request: Request):
+    if not hasattr(request.app.state, "analyzer"):
+        from src.core.visual_analyzer import VisualAnalyzer
+        request.app.state.analyzer = VisualAnalyzer()
+    return request.app.state.analyzer
+
 
 def upload_mask_bytes(mask_bytes: bytes, folder: str) -> str:
     result: Dict[str, str] = {}
@@ -66,7 +72,10 @@ def aggregate(results: List[Dict]) -> Dict:
 
 @router.get("/models/visual/health")
 def health(request: Request):
-    return {"status": "ok", "models_loaded": request.app.state.analyzer is not None}
+    return {
+        "status": "ok",
+        "models_loaded": hasattr(request.app.state, "analyzer")
+    }
 
 
 @router.post("/models/visual/analyze")
@@ -75,8 +84,9 @@ async def analyze(request: Request, files: List[UploadFile] = File(...)):
         if not f.content_type or not f.content_type.startswith("image/"):
             raise HTTPException(status_code=400, detail=f"{f.filename} is not an image")
 
-    analyzer = request.app.state.analyzer
+    analyzer = get_analyzer(request)  # ✅ pakai lazy load
     results  = []
+
     for f in files:
         image_bytes = await f.read()
         results.append(analyzer.analyze(image_bytes))
@@ -96,7 +106,7 @@ async def segment(request: Request, files: List[UploadFile] = File(...)):
         if not f.content_type or not f.content_type.startswith("image/"):
             raise HTTPException(status_code=400, detail=f"{f.filename} is not an image")
 
-    analyzer = request.app.state.analyzer
+    analyzer = get_analyzer(request)  # ✅ pakai lazy load
     metrics: List[Dict] = []
     per_photo: List[Dict] = []
 
@@ -126,6 +136,7 @@ def get_forecasts(limit: Optional[int] = Query(None, gt=0)):
     p = _get_forecast_path()
     if not p.exists():
         raise HTTPException(status_code=404, detail="forecast_output.json not found")
+
     try:
         data = json.loads(p.read_text(encoding="utf-8"))
     except Exception as e:
@@ -146,4 +157,3 @@ def download_forecast():
     if not p.exists():
         raise HTTPException(status_code=404, detail="forecast_output.json not found")
     return FileResponse(str(p), filename=p.name, media_type="application/json")
- 
