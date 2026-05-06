@@ -4,7 +4,10 @@ from fastapi import APIRouter, File, HTTPException, Request, UploadFile, Query
 from fastapi.responses import FileResponse, JSONResponse
 from pathlib import Path
 import json
-from cloudinary import v2 as cloudinary
+
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 
 from src.core.visual_analyzer import WEIGHTS
 
